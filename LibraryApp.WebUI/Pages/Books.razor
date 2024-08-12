@@ -1,0 +1,63 @@
+﻿@page "/books"
+@using System.Text.Json
+@using static LibraryApp.WebUI.Pages.Authors
+@inject HttpClient Http
+
+<PageTitle>Books</PageTitle>
+
+<h1>Books</h1>
+
+<p>This component displays book records</p>
+
+@if (authors == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Author</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                var author = @authors.FirstOrDefault(x => x.id == @book.authorId);
+                <tr>
+                    <td>@book.id</td>
+                    <td>@book.title</td>
+                    <td>
+                        @author.firstName @author.lastName
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Book>? books;
+    private List<Author>? authors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var booksResult = await Http.GetAsync("https://localhost:7282/api/Book");
+        var booksData = await booksResult.Content.ReadAsStringAsync();
+        books = JsonSerializer.Deserialize<List<Book>>(booksData) ?? new List<Book>();
+
+        var authorResult = await Http.GetAsync("https://localhost:7282/api/Author");
+        var authorsData = await authorResult.Content.ReadAsStringAsync();
+        authors = JsonSerializer.Deserialize<List<Author>>(authorsData) ?? new List<Author>();
+    }
+
+    public class Book
+    {
+        public int id { get; set; }
+        public string? title { get; set; }
+        public int authorId { get; set; }
+    }
+}

@@ -1,0 +1,54 @@
+﻿@page "/authors"
+@using System.Text.Json
+@inject HttpClient Http
+
+<PageTitle>Authors</PageTitle>
+
+<h1>Authors</h1>
+
+<p>This component display author records</p>
+
+@if (authors == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var author in authors)
+            {
+                <tr>
+                    <td>@author.id</td>
+                    <td>@author.firstName</td>
+                    <td>@author.lastName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Author>? authors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Http.GetAsync("https://localhost:7282/api/Author");
+        var data = await result.Content.ReadAsStringAsync();
+        authors = JsonSerializer.Deserialize<List<Author>>(data) ?? new List<Author>();
+    }
+
+    public class Author
+    {
+        public int id { get; set; }  
+        public string? firstName { get; set; }
+        public string? lastName { get; set; }
+    }
+}
