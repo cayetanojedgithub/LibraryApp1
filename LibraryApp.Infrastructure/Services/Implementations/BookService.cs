@@ -19,10 +19,10 @@ namespace LibraryApp.Infrastructure.Services.Implementations
             });
         }
 
-        public Task<Book> GetByIdAsync(int id)
+        public Task<Book?> GetByIdAsync(int id)
         {
             return Task.Run(() => {
-                return _library.GetBooks().First(x => x.Id == id);
+                return _library.GetBooks().FirstOrDefault(x => x.Id == id) ?? null;
             });
         }
 

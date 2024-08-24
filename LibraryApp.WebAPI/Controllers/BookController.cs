@@ -1,6 +1,5 @@
 ﻿using LibraryApp.Core.Models;
 using LibraryApp.Core.Services.Contracts;
-using LibraryApp.Infrastructure.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -19,53 +18,61 @@ namespace LibraryApp.WebAPI.Controllers
         }
         // GET: api/<BookController>
         [HttpGet]
-        public async Task<IEnumerable<Book>> Get()
+        public async Task<IActionResult> Get()
         {
-            return await _bookService.GetAllAsync();
+            var books = await _bookService.GetAllAsync();
+
+            return Ok(books);
         }
 
         // GET api/<BookController>/5
         [HttpGet("{id}")]
-        public async Task<Book> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var collection = await _bookService.GetAllAsync();
-            var item = collection.Find(x => x.Id == id);
+            var item = await _bookService.GetByIdAsync(id);
 
             if (item == null)
             {
-                throw new Exception($"Book with id:{id} not found.");
+                return NotFound();
             }
-            return item;
+            return Ok(item);
         }
 
         // POST api/<BookController>
         [HttpPost]
-        public async Task Post([FromBody] Book book)
+        public async Task<IActionResult> Post([FromBody] BookForm bookForm)
         {
-            if (book == null)
+            if (bookForm == null)
             {
-                throw new ArgumentNullException(nameof(book));
+                return BadRequest();
             }
 
-            await _bookService.SaveAsync(book);
+            if (await _bookService.SaveAsync(new Book()
+            {
+                Title = bookForm.Title,
+                AuthorId = bookForm.AuthorId
+            }))
+            {
+                return Created();
+            }
+
+            return StatusCode(500, "Internal server error.");
         }
 
         // PUT api/<BookController>/5
         [HttpPut("{id}")]
-        public async Task Put(int id, [FromBody] Book book)
+        public async Task<IActionResult> Put(int id, [FromBody] BookForm bookForm)
         {
-            if (id == 0)
+            if (await _bookService.SaveAsync(new Book() { 
+                Id = id,
+                Title = bookForm.Title,
+                AuthorId = bookForm.AuthorId
+            }))
             {
-                throw new ArgumentException(nameof(id));
+                return Ok(bookForm);
             }
 
-            if (book == null)
-            {
-                throw new ArgumentException(nameof(book));
-
-            }
-
-            await _bookService.SaveAsync(book);
+            return StatusCode(500, "Internal server error.");
         }
     }
 }
