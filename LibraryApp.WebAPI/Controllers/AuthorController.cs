@@ -19,6 +19,7 @@ namespace LibraryApp.WebAPI.Controllers
         }
 
         [HttpGet("authors")]
+        [CustomAuthorization]
         public async Task<IActionResult> Get()
         {
             var authors = await _authorService.GetAllAsync();
