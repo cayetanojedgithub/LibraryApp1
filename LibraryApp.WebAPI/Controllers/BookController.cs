@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    //[Authorize]
     [ApiController]
     public class BookController : ControllerBase
     {
@@ -16,8 +16,8 @@ namespace LibraryApp.WebAPI.Controllers
         {
             _bookService = bookService;   
         }
-        // GET: api/<BookController>
-        [HttpGet]
+
+        [HttpGet("books")]
         public async Task<IActionResult> Get()
         {
             var books = await _bookService.GetAllAsync();
@@ -25,8 +25,7 @@ namespace LibraryApp.WebAPI.Controllers
             return Ok(books);
         }
 
-        // GET api/<BookController>/5
-        [HttpGet("{id}")]
+        [HttpGet("book/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var item = await _bookService.GetByIdAsync(id);
@@ -38,8 +37,7 @@ namespace LibraryApp.WebAPI.Controllers
             return Ok(item);
         }
 
-        // POST api/<BookController>
-        [HttpPost]
+        [HttpPost("book")]
         public async Task<IActionResult> Post([FromBody] BookForm bookForm)
         {
             if (bookForm == null)
@@ -59,8 +57,7 @@ namespace LibraryApp.WebAPI.Controllers
             return StatusCode(500, "Internal server error.");
         }
 
-        // PUT api/<BookController>/5
-        [HttpPut("{id}")]
+        [HttpPut("book/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] BookForm bookForm)
         {
             if (await _bookService.SaveAsync(new Book() { 

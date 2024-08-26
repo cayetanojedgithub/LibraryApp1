@@ -45,11 +45,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var booksResult = await Http.GetAsync("https://localhost:7282/api/Book");
+        var booksResult = await Http.GetAsync("https://localhost:7282/books");
         var booksData = await booksResult.Content.ReadAsStringAsync();
         books = JsonSerializer.Deserialize<List<Book>>(booksData) ?? new List<Book>();
 
-        var authorResult = await Http.GetAsync("https://localhost:7282/api/Author");
+        var authorResult = await Http.GetAsync("https://localhost:7282/authors");
         var authorsData = await authorResult.Content.ReadAsStringAsync();
         authors = JsonSerializer.Deserialize<List<Author>>(authorsData) ?? new List<Author>();
     }

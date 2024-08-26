@@ -1,12 +1,13 @@
 ﻿using LibraryApp.Core.Models;
 using LibraryApp.Core.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace LibraryApp.WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    //[Authorize]
     [ApiController]
     public class AuthorController : ControllerBase
     {
@@ -16,8 +17,8 @@ namespace LibraryApp.WebAPI.Controllers
         {
             _authorService = authorService;        
         }
-        // GET: api/<AuthorController>
-        [HttpGet]
+
+        [HttpGet("authors")]
         public async Task<IActionResult> Get()
         {
             var authors = await _authorService.GetAllAsync();
@@ -25,8 +26,7 @@ namespace LibraryApp.WebAPI.Controllers
             return Ok(authors);
         }
 
-        // GET api/<AuthorController>/5
-        [HttpGet("{id}")]
+        [HttpGet("author/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var item = await _authorService.GetByIdAsync(id);
@@ -38,8 +38,7 @@ namespace LibraryApp.WebAPI.Controllers
             return Ok(item);
         }
 
-        // POST api/<AuthorController>
-        [HttpPost]
+        [HttpPost("author")]
         public async Task<IActionResult> Post([FromBody] AuthorForm authorForm)
         {
             if (authorForm == null)
@@ -58,20 +57,9 @@ namespace LibraryApp.WebAPI.Controllers
             return StatusCode(500, "Internal server error.");
         }
 
-        // PUT api/<AuthorController>/5
-        [HttpPut("{id}")]
+        [HttpPut("author/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] AuthorForm author)
         {
-            if (id == 0)
-            {
-                return BadRequest($"Invalid value: {nameof(id)} {id} ");
-            }
-
-            if (author == null)
-            {
-                return BadRequest($"Object is null: {nameof(author)} {author} ");
-            }
-
             if (await _authorService.SaveAsync(new Author() { 
                 Id = id,
                 FirstName = author.FirstName,
